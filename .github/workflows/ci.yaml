@@ -10,10 +10,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Rust
-        uses: actions/setup-rust@v1
+      - name: Setup Rust Toolchain
+        uses: actions-rs/toolchain@v1
         with:
-          rust-version: stable
+          toolchain: stable
+          components: clippy
 
       - name: Install Clippy
         run: rustup component add clippy
@@ -25,8 +26,7 @@ jobs:
         run: cargo clippy -- -D warnings
 
       - name: Add Rainbow ASCII art
-        run:
-            |
+        run: |
           echo 'img = welcome_message = r#"
           \x1b[31m         ____   _____   _____  ____   _   _\x1b[0m
           \x1b[33m    / __ \ |  __ \ |_   _|/ __ \ | \ | |\x1b[0m
@@ -40,10 +40,10 @@ jobs:
           \x1b[38;5;196m   | |     | |       | |\x1b[0m
           \x1b[38;5;166m   | |____ | |____  _| |_ \x1b[0m
           \x1b[38;5;125m    \_____||______||_____| "\x1b[0m
-
           \x1b[91m####### WELCOME FROM ORION #######\x1b[0m' > ./ORION.txt
-          PROJECT: {{ github.repository }} | FEATURE: {{ github.ref }} 
-          \x1b[32m-------------  COMMIT: {{ github.sha }} ------------- |0m' > ORION.txt
+
+          echo "PROJECT: ${{ github.repository }} | FEATURE: ${{ github.ref }}" >> ./ORION.txt
+          echo "COMMIT: ${{ github.sha }}" >> ./ORION.txt
 
       - name: Commit ASCII art
         run: |
@@ -53,4 +53,4 @@ jobs:
           git commit -m "Add colored ASCII art welcome message"
           git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
