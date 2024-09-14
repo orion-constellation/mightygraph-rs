@@ -51,8 +51,9 @@
 //! - `petgraph_full_0x0`: Core module for the graph data structures and analyses.
 //! - `utils`: Utility functions for exporting data to various formats and computing
 //!   additional metrics.
-mod petgraph_full_0x0;
+mod prelude;
 mod utils;
+mod petgraph_full_0x0;
 
 use std::collections::{HashMap, HashSet};
 use std::fs::{self, File};
@@ -61,18 +62,14 @@ use std::path::Path;
 use chrono::NaiveDate;
 use petgraph::graph::{Graph, NodeIndex};
 use petgraph::algo::{connected_components, dijkstra};
-use petgraph::visit::EdgeRef;
+use polars::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use polars::prelude::*;
-use petgraph_full_0x0::{ Mapping, NodeData, NodeType, MappingGraph, EdgeData, MappingGraph, export_combined_data, export_node_degree_analysis, main };
-use petgraph_full_0x0::{ create_graph, perform_analyses, export_to_json, perform_basic_stats,
-    export_to_parquet, export_to_csv, perform_mapping_type_analysis, perform_node_degree_analysis,
-        perform_connected_components_analysis, perform_shortest_path_analysis, perform_edge_strength_analysis,
-        export_combined_data, perform_node_type_distribution, export_node_degree_analysis, export_to_json, export_to_parquet, export_to_csv };
+use utils::{ add_node_if_not_exists, calculate_strength };
+
 
 #[derive(Debug, Deserialize, Serialize)]
-struct Mapping {
+pub struct Mapping {
     mapping_framework: String,
     mapping_framework_version: String,
     capability_group: String,
@@ -91,27 +88,27 @@ struct Mapping {
 }
 
 #[derive(Debug, Serialize)]
-struct NodeData {
+pub struct NodeData {
     id: String,
     node_type: NodeType,
     metadata: HashMap<String, String>,
 }
 
 #[derive(Debug, PartialEq, Serialize)]
-enum NodeType {
+pub enum NodeType {
     Veris,
     Mitre,
 }
 
 #[derive(Debug, Serialize)]
-struct EdgeData {
+pub struct EdgeData {
     mapping_type: String,
     strength: f32,
 }
 
 type MappingGraph = Graph<NodeData, EdgeData>;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load the CSV data
     let file = File::open("veris_mitre_mapping.csv")?;
     let reader = BufReader::new(file);
@@ -160,7 +157,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for mapping in &mappings {
         let frequency = node_degree_analysis.get(&mapping.attack_object_id).unwrap_or(&0);
         let strength = calculate_strength(&mapping);
-        let impact_score = (*frequency as f32 * strength) / 10.0; // Normalize to 0-10 scale
+        let impact_score = (*frequency * strength) / 10.0; // Normalize to 0-10 scale
 
         combined_data.push(json!({
             "veris_id": mapping.capability_id,
@@ -190,12 +187,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     ])?;
 
     // Export to Parquet
-    let mut file = File::create("./analysed/data/combined_analysis.parquet")?;
-    ParquetWriter::new(&mut file).finish(&df)?;
+    let mut file = File::create("./analysed/results/parquetMitreCombined_combined_analysis.parquet")?;
+    let parquet_writer = polars::prelude::ParquetWriter::new(&mut file);
+    parquet_writer.finish(&df)?;
 
     // Export to CSV
-    let mut file = File::create("./analysed/ds/combined_analysis.csv")?;
-    CsvWriter::new(&mut file).finish(&df)?;
+    let mut file = File::create("./analysed/results/csv_verisMitre_combined_analysis_0x0.csv")?;
+    let csv_writer = CsvWriter::new(&mut file)
+            .finish(&mut df)?;
 
     Ok(())
 }

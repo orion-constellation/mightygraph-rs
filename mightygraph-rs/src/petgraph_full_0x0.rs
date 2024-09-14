@@ -1,7 +1,9 @@
 
 
 
+pub mod prelude;
 
+use petgraph::prelude::*;
 use std::collections::{HashMap, HashSet};
 use std::fs::{self, File};
 use std::io::BufReader;
@@ -9,7 +11,6 @@ use std::path::Path;
 use chrono::NaiveDate;
 use petgraph::graph::{Graph, NodeIndex};
 use petgraph::algo::{connected_components, dijkstra};
-use petgraph::visit::EdgeRef;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use polars::prelude::*;
