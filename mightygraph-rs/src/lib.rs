@@ -191,7 +191,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Export to Parquet
     let mut file = File::create("./analysed/data/combined_analysis.parquet")?;
-    ParquetWriter::new(&mut file).finish(&df)?;
+    polars::prelude::ParquetWriter::new(&mut file).finish(&df)?;
 
     // Export to CSV
     let mut file = File::create("./analysed/ds/combined_analysis.csv")?;
@@ -200,14 +200,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn export_to_json<T: Serialize>(name: &str, data: &T) -> Result<(), Box<dyn std::error::Error>> {
-    let dir = Path::new("./analysed/data");
-    fs::create_dir_all(dir)?;
-    let path = dir.join(format!("{}.json", name));
-    let file = File::create(path)?;
-    serde_json::to_writer_pretty(file, data)?;
-    Ok(())
-}
+
 
 // ... [Keep the existing helper functions like add_node_if_not_exists, create_metadata, calculate_strength]
 
