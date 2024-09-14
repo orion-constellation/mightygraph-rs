@@ -1,0 +1,33 @@
+
+target/
+
+
+**/*.rs.bk
+**/*.rs~
+.DS_Store
+
+.*
+!/.gitignore  # Include .gitignore file if necessary
+
+# Ignore unnecessary project files
+Dockerfile*
+docker-compose.yml
+.dockerignore
+README.md
+
+# Ignore node_modules if you're using a frontend or JavaScript/TypeScript in your project
+node_modules/
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# Ignore compiled output and artifacts for databases
+**/*.sql~
+**/*.db
+**/*.sqlite
+
+# Ignore Redis dump files if created
+dump.rdb
+appendonly.aof

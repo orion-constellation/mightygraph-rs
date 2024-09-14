@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  postgres:
+    build:
+      context: ./db/
+      dockerfile: Dockerfile.psql
+    image: postgres:latest
+    container_name: etl_pipeline_pgres
+    environment:
+      POSTGRES_USER: ${USER_PSQL}
+      POSTGRES_PASSWORD: ${PW_PSQL_PW}
+      POSTGRES_DB: etl_pipeline_001
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - etl_network
+
+  redis:
+    build:
+      context: ./db/redis
+      dockerfile: Dockerfile.redis
+    container_name: etl_pipeline_redis
+    environment:
+      REDIS_USER: ${REDIS_USER}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - etl_network
+  
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - TERM=linux
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-polystat-panel
+    ports:
+      - '3000:3000'
+    volumes:
+      - 'grafana_storage:/var/lib/grafana'
+  
+  rust_app:
+    build:
+      context: .
+      dockerfile: Dockerfile.rust
+    container_name: etl_pipeline_001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      grafana:
+        condition: service_started
+        
+    
+      
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  grafana_storage: {}
+
+networks:
+  etl_network:
+    driver: bridge
