@@ -1,6 +1,7 @@
 
 
-
+use crate::add_node_if_not_exists;
+pub mod prelude;
 
 use std::collections::{HashMap, HashSet};
 use std::fs::{self, File};
@@ -9,7 +10,6 @@ use std::path::Path;
 use chrono::NaiveDate;
 use petgraph::graph::{Graph, NodeIndex};
 use petgraph::algo::{connected_components, dijkstra};
-use petgraph::visit::EdgeRef;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use polars::prelude::*;
@@ -103,7 +103,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     for mapping in &mappings {
         let frequency = node_degree_analysis.get(&mapping.attack_object_id).unwrap_or(&0);
         let strength = calculate_strength(&mapping);
-        let impact_score = (*frequency as f32 * strength) / 10.0; // Normalize to 0-10 scale
+        let impact_score = (*frequency * strength) / 10.0; // Normalize to 0-10 scale
 
         combined_data.push(json!({
             "veris_id": mapping.capability_id,
@@ -134,11 +134,11 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Export to Parquet
     let mut file = File::create("./analysed/data/combined_analysis.parquet")?;
-    ParquetWriter::new(&mut file).finish(&df)?;
+    polars::prelude::ParquetWriter::new(&mut file).finish(&df)?;
 
     // Export to CSV
     let mut file = File::create("./analysed/ds/combined_analysis.csv")?;
-    CsvWriter::new(&mut file).finish(&df)?;
+    CsvWriter::new(&mut file).finish(&mut df)?;
 
     Ok(())
 }

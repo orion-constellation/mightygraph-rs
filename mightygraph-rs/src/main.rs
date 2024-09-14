@@ -82,20 +82,11 @@ use std::fs::{self, File};
 use std::io::{BufReader, BufWriter};
 use std::path::Path;
 use petgraph::graph::{Graph, NodeIndex};
-use petgraph::visit::EdgeRef;
-use serde_json::json;
 use polars::prelude::ParquetWriter;
+use polars::series::Series;
+use petgraph_full_0x0::prelude::*;
 use csv;
-
-// Import specific utility functions from utils
 use utils::*;
-
-// Import structures and types from petgraph_full_0x0
-use petgraph_full_0x0::{ Mapping, NodeData, NodeType, MappingGraph, EdgeData, MappingGraph, export_combined_data, export_node_degree_analysis, main };
-use petgraph_full_0x0::{ create_graph, perform_analyses, export_to_json, perform_basic_stats,
-    export_to_parquet, export_to_csv, perform_mapping_type_analysis, perform_node_degree_analysis,
-        perform_connected_components_analysis, perform_shortest_path_analysis, perform_edge_strength_analysis,
-        export_combined_data, perform_node_type_distribution, export_node_degree_analysis, export_to_json, export_to_parquet, export_to_csv };
 
 
 // Structures definitions remain the same
@@ -110,11 +101,11 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// - `Result<()>`: Indicates the success or failure of the main process.
 fn main() -> Result<()> {
     // 1. Load the CSV data
-    static csv_file: &str = "/Users/nullzero/Documents/repos/opencti/veris_mitre_map/veris_mitre_map/data /veris-1.3.7_attack-12.1-enterprise.csv";
+    let csv_file = "/Users/nullzero/Documents/repos/opencti/veris_mitre_map/veris_mitre_map/data/veris-1.3.7_attack-12.1-enterprise.csv";
     let file = File::open(csv_file)?;
     let reader = BufReader::new(file);
     let mut rdr = csv::Reader::from_reader(reader);
-    let mappings: Vec<Mapping> = rdr.deserialize().collect::<dyn Result<_, Error>>()?;
+    let mappings: Vec<Mapping> = rdr.deserialize().collect::<Option<Result<(), Err()>>;
 
     // 2. Create the graph and add nodes/edges
     let (graph, node_indices) = create_graph(&mappings)?;
@@ -130,7 +121,6 @@ fn main() -> Result<()> {
 
     Ok(())
 }
-
 
 
 /// Creates a graph based on the provided mappings.
