@@ -1,0 +1,23 @@
+hard_tabs = false
+
+max_width = 100
+
+format_code_in_doc_comments = true
+
+trailing_comma = "Always"
+
+vertical_layout = true
+
+reorder_imports = true
+
+format_macro_matchers = true
+
+match_arm_blocks = true
+
+closure_block_indent = true
+
+chain_one_line = false
+
+single_line_if_else_max_width = 50
+
+clippy_preference = "opt-in"

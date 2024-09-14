@@ -1,0 +1,53 @@
+name: Rust CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions/setup-rust@v1
+        with:
+          rust-version: stable
+
+      - name: Install Clippy
+        run: rustup component add clippy
+
+      - name: Format code
+        run: cargo fmt -- --check
+
+      - name: Run Clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Add Rainbow ASCII art
+        run: |
+          echo 'img = welcome_message = r#"
+          \x1b[31m         ____   _____   _____  ____   _   _\x1b[0m
+          \x1b[33m    / __ \ |  __ \ |_   _|/ __ \ | \ | |\x1b[0m
+          \x1b[32m   | |  | || |__) |  | | | |  | ||  \| |\x1b[0m
+          \x1b[34m   | |  | ||  _  /   | | | |  | || . ` |\x1b[0m
+          \x1b[35m   | |__| || | \ \  _| |_| |__| || |\  |\x1b[0m
+          \x1b[36m    \____/ |_|  \_\|_____|\____/ |_| \_|\x1b[0m
+          \x1b[37m     _____  _       _____\x1b[0m
+          \x1b[38;5;208m     | |     | |       | |\x1b[0m
+          \x1b[38;5;206m    / ____|| |     |_   _|\x1b[0m
+          \x1b[38;5;196m   | |     | |       | |\x1b[0m
+          \x1b[38;5;166m   | |____ | |____  _| |_ \x1b[0m
+          \x1b[38;5;125m    \_____||______||_____| "\x1b[0m
+
+          \x1b[91m####### WELCOME FROM ORION #######\x1b[0m' > text/welcome.txt
+
+      - name: Commit ASCII art
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add text/welcome.txt
+          git commit -m "Add colored ASCII art welcome message"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS }}

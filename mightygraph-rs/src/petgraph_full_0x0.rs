@@ -15,7 +15,7 @@ use serde_json::json;
 use polars::prelude::*;
 
 #[derive(Debug, Deserialize, Serialize)]
-struct Mapping {
+pub struct Mapping {
     mapping_framework: String,
     mapping_framework_version: String,
     capability_group: String,
@@ -34,7 +34,7 @@ struct Mapping {
 }
 
 #[derive(Debug, Serialize)]
-struct NodeData {
+pub struct NodeData {
     id: String,
     node_type: NodeType,
     metadata: HashMap<String, String>,
@@ -47,7 +47,7 @@ enum NodeType {
 }
 
 #[derive(Debug, Serialize)]
-struct EdgeData {
+pub struct EdgeData {
     mapping_type: String,
     strength: f32,
 }
@@ -152,7 +152,7 @@ pub fn export_to_json<T: Serialize>(name: &str, data: &T) -> Result<(), Box<dyn 
     Ok(())
 }
 
-// ... [Keep the existing helper functions like add_node_if_not_exists, create_metadata, calculate_strength]
+
 
 pub fn perform_basic_stats(graph: &MappingGraph, mappings: &[Mapping]) -> serde_json::Value {
     json!({
