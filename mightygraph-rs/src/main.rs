@@ -92,7 +92,10 @@ use utils::*;
 
 // Import structures and types from petgraph_full_0x0
 use petgraph_full_0x0::{ Mapping, NodeData, NodeType, MappingGraph, EdgeData, MappingGraph, export_combined_data, export_node_degree_analysis, main };
-use petgraph_full_0x0::{ create_graph, perform_analyses };
+use petgraph_full_0x0::{ create_graph, perform_analyses, export_to_json, perform_basic_stats,
+    export_to_parquet, export_to_csv, perform_mapping_type_analysis, perform_node_degree_analysis,
+        perform_connected_components_analysis, perform_shortest_path_analysis, perform_edge_strength_analysis,
+        export_combined_data, perform_node_type_distribution, export_node_degree_analysis, export_to_json, export_to_parquet, export_to_csv };
 
 
 // Structures definitions remain the same

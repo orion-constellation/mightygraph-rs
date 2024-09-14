@@ -3,7 +3,6 @@ mod tests {
     use super::*;
 
 
-
     #[test]
     fn test_load_csv_data_success() {
         use std::fs::File;
