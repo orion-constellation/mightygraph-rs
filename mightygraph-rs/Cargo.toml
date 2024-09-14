@@ -1,5 +1,5 @@
 [package]
-name = "petgraph_full"
+name = "mighty_graph_rs"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,11 +10,12 @@ serde_json = "1.0"
 csv = "1.1"
 chrono = "0.4"
 polars = "0.25"
+parquet = "53.0.0"
 
 [lib]
-name="VerisAttack"
+name="mighty_graph_rs"
 path="src/lib.rs"
 
 [[bin]]
-name="VerisAttack"
+name="mighty_graph_rs"
 path="src/main.rs"
