@@ -25,7 +25,8 @@ jobs:
         run: cargo clippy -- -D warnings
 
       - name: Add Rainbow ASCII art
-        run: |
+        run:
+            |
           echo 'img = welcome_message = r#"
           \x1b[31m         ____   _____   _____  ____   _   _\x1b[0m
           \x1b[33m    / __ \ |  __ \ |_   _|/ __ \ | \ | |\x1b[0m
@@ -40,13 +41,15 @@ jobs:
           \x1b[38;5;166m   | |____ | |____  _| |_ \x1b[0m
           \x1b[38;5;125m    \_____||______||_____| "\x1b[0m
 
-          \x1b[91m####### WELCOME FROM ORION #######\x1b[0m' > text/welcome.txt
+          \x1b[91m####### WELCOME FROM ORION #######\x1b[0m' > ./ORION.txt
+          PROJECT: {{ github.repository }} | FEATURE: {{ github.ref }} 
+          \x1b[32m-------------  COMMIT: {{ github.sha }} ------------- |0m' > ORION.txt
 
       - name: Commit ASCII art
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add text/welcome.txt
+          git add ORION.txt
           git commit -m "Add colored ASCII art welcome message"
           git push
         env:
